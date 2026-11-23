@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Buscador YVS</title>
+<meta name="description" content="Catálogo YVS de suspensión, amortiguación y frenos: busque por número de parte o por vehículo.">
+<meta name="theme-color" content="#111111">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="YVS">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: black brand band + sticky search panel, single-column result cards, bottom-sheet product detail */
+:root{
+  --yel:#FFD300; --ink:#111111; --red:#C80A00;
+  --bg:#F5F4EF; --card:#FFFFFF; --fg:#16150F; --muted:#6B6858; --line:#E3E0D3; --chip:#ECEAE0; --field:#FFFFFF; --hl:#FFF3B0;
+  --band:#111111; --bandfg:#F5F4EF;
+  --f-disp:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --f-body:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --red:#FF5A4D; --bg:#121210; --card:#1C1B18; --fg:#F1EFE6; --muted:#A3A08F; --line:#2E2C26; --chip:#26251F; --field:#181814; --hl:#4A4110;
+  --band:#000000; --bandfg:#F1EFE6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --red:#FF5A4D; --bg:#121210; --card:#1C1B18; --fg:#F1EFE6; --muted:#A3A08F; --line:#2E2C26; --chip:#26251F; --field:#181814; --hl:#4A4110;
+  --band:#000000; --bandfg:#F1EFE6; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.grid2>*,.field{min-width:0}
+.field select{width:100%}
+img{max-width:100%}
+html,body{overflow-x:hidden}
+
+input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.4;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--band)}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:760px;margin:0 auto}
+header.brand{background:var(--band);color:var(--bandfg);margin-top:calc(-1*env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px)}
+header.brand .wrap{display:flex;align-items:center;gap:12px;padding-block:12px}
+.logo{width:52px;height:52px;border-radius:10px;background:#FFFFFF;display:grid;place-items:center;flex:none}
+.logo img{width:44px;height:auto}
+.brand h1{font-family:var(--f-disp);font-weight:800;font-size:26px;letter-spacing:.02em;margin:0;line-height:1;text-transform:uppercase}
+.brand p{margin:3px 0 0;font-size:12px;color:#BDB9A8}
+.stripe{height:5px;background:var(--yel)}
+.panel{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.panel .wrap{padding-block:12px;display:grid;gap:10px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--chip);border-radius:10px;padding:3px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:600 14px var(--f-body);padding:9px 6px;border-radius:8px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--yel)}
+.field{display:flex;align-items:center;gap:8px;background:var(--field);border:2px solid var(--line);border-radius:10px;padding:0 12px;min-height:48px}
+.field:focus-within{border-color:var(--yel)}
+.field svg{flex:none;color:var(--muted)}
+.field input,.field select{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--fg);font:500 16px var(--f-body);padding:12px 0}
+.clear{border:0;background:var(--chip);color:var(--muted);border-radius:50%;width:26px;height:26px;font-size:16px;line-height:1;cursor:pointer;flex:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid2 .full{grid-column:1/-1}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:0 max(16px,env(safe-area-inset-left,0px))}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--fg);font:500 13px var(--f-body);padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--yel);border-color:var(--yel);color:#111111;font-weight:700}
+.status{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.status b{color:var(--fg)}
+main .wrap{padding-block:14px 40px;display:grid;gap:10px}
+.card{display:grid;grid-template-columns:64px 1fr;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;text-align:left;width:100%;color:inherit;font:inherit}
+.card:focus-visible,.chip:focus-visible,.tabs button:focus-visible,.btn:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
+.thumb{width:64px;height:64px;border-radius:8px;background:#FFFFFF;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.thumb img{max-width:100%;max-height:100%;object-fit:contain}
+.thumb span{font:800 13px var(--f-disp);color:#8A8676;letter-spacing:.04em}
+.ci{min-width:0;display:grid;gap:3px}
+.top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.code{font:700 20px var(--f-disp);color:var(--red);letter-spacing:.02em}
+.tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.veh{font-weight:600;overflow-wrap:anywhere}
+.meta{font-size:13px;color:var(--muted);display:flex;gap:6px 12px;flex-wrap:wrap}
+.meta .pos{background:var(--chip);color:var(--fg);border-radius:6px;padding:1px 7px;font-weight:500}
+.price{font:700 15px var(--f-disp);color:var(--fg)}
+mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 2px}
+.more{justify-self:center;margin-top:6px}
+.btn{border:0;background:var(--ink);color:var(--yel);font:700 14px var(--f-body);padding:12px 18px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:var(--chip);color:var(--fg)}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:18px;color:var(--muted);display:grid;gap:10px}
+.empty h2{margin:0;font:700 20px var(--f-disp);color:var(--fg);text-transform:uppercase;letter-spacing:.02em}
+.empty .ex{display:flex;flex-wrap:wrap;gap:6px}
+.loading{padding:28px 0;text-align:center;color:var(--muted)}
+.sheet{position:fixed;inset:0;z-index:40;display:grid;align-items:end;background:rgba(0,0,0,.5)}
+.sheet .box{background:var(--card);max-height:92vh;overflow-y:auto;border-radius:16px 16px 0 0;width:100%;max-width:760px;margin:0 auto;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+.sheet .hd{position:sticky;top:0;background:var(--card);border-bottom:4px solid var(--yel);display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.sheet .hd .code{font-size:28px}
+.sheet .bd{padding:14px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));display:grid;gap:14px}
+.pic{background:#FFFFFF;border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;padding:10px;min-height:120px}
+.pic img{max-height:200px;object-fit:contain}
+dl{margin:0;display:grid;grid-template-columns:minmax(90px,34%) 1fr;border-top:1px solid var(--line)}
+dt,dd{margin:0;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+dt{color:var(--muted);font-weight:500;padding-right:10px}
+dd{white-space:pre-line;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.sec{font:700 16px var(--f-disp);text-transform:uppercase;letter-spacing:.04em;margin:4px 0 -4px}
+.apps{display:grid;gap:4px;font-size:14px}
+.apps div{padding:7px 10px;background:var(--chip);border-radius:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:0 0 28px}
+footer em{display:block;margin-top:4px}
+@media (prefers-reduced-motion:no-preference){.sheet .box{animation:up .18s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}}}
+html,body{margin:0}
+:root{padding-top:env(safe-area-inset-top,0px)}
+main .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+footer{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+nav.bar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--band);border-top:3px solid var(--yel);display:flex;justify-content:center;padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+nav.bar .in{display:flex;gap:4px;width:100%;max-width:760px}
+nav.bar button{flex:1;border:0;background:transparent;color:#A8A493;font:600 12px var(--f-body);display:grid;justify-items:center;gap:3px;padding:6px 4px;border-radius:10px;cursor:pointer}
+nav.bar button svg{width:24px;height:24px}
+nav.bar button[aria-selected="true"]{color:var(--yel)}
+.ios{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:8px}
+.ios ol{margin:0;padding-left:20px;display:grid;gap:6px}
+.offline{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="brand"><div class="wrap">
+  <div class="logo"><img src="icons/logo.png" alt="YVS Auto Parts"></div>
+  <div><h1>Buscador YVS</h1><p>Catálogo maestro 2025-2026 · Suspensión, amortiguación y frenos</p></div>
+</div></header>
+<div class="stripe"></div>
+<section class="panel" aria-label="Búsqueda"><div class="wrap">
+  
+  <div id="pNum">
+    <label class="field" for="qNum">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input id="qNum" type="search" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="OE, KYB, Monroe, FMSI o código YVS">
+      <button class="clear" id="clrNum" type="button" aria-label="Borrar" hidden>×</button>
+    </label>
+  </div>
+  <div id="pVeh" class="grid2" hidden>
+    <label class="field full" for="qBrand"><select id="qBrand" aria-label="Marca"><option value="">Todas las marcas</option></select></label>
+    <label class="field" for="qModel"><input id="qModel" type="search" list="models" autocomplete="off" placeholder="Modelo (ej. AVEO)"></label>
+    <label class="field" for="qYear"><input id="qYear" type="number" inputmode="numeric" min="1950" max="2035" placeholder="Año"></label>
+    <datalist id="models"></datalist>
+  </div>
+  <div class="chips" id="chips" aria-label="Línea de producto"></div>
+  <div class="status" id="status"><span>Cargando catálogo…</span></div>
+</div></section>
+<main><div class="wrap" id="out"><div class="loading">Cargando catálogo YVS…</div></div></main>
+<footer><div class="wrap"><div class="offline" id="off"></div>YVSYSTEM · El Marqués, Querétaro, México<em>“No es solo vender repuestos, es construir confianza para mantener el mundo en movimiento”</em></div></footer>
+<div class="sheet" id="sheet" hidden><div class="box" role="dialog" aria-modal="true" aria-labelledby="shCode"><div class="hd"><div><div class="tag" id="shLine"></div><div class="code" id="shCode"></div></div><button class="btn ghost" id="shClose" type="button">Cerrar</button></div><div class="bd" id="shBody"></div></div></div>
+<nav class="bar" aria-label="Secciones"><div class="in" role="tablist">
+  <button id="tabNum" role="tab" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg>N° de parte</button>
+  <button id="tabVeh" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17h14M3 13l2-6h14l2 6v4H3z"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/></svg>Vehículo</button>
+  <button id="tabInst" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 21h14"/></svg>Instalar</button>
+</div></nav>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var D=null, IMG={}, mode="num", line=-1, shown=60, last=[];
+var SHORT=["Amortiguadores","Chinos","Tipo Rancho","Load Carrier","Resortes","Accesorios","Frenos"];
+var store={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+function norm(s){return String(s||"").toUpperCase().replace(/[\s\-\.\/_·]/g,"")}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function fmtUSD(v){return v==null?"":"US$ "+Number(v).toLocaleString("es-MX",{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+async function loadJSON(name){var r=await fetch(name);if(!r.ok)throw new Error(r.status);return r.json()}
+async function init(){
+  try{D=await loadJSON("catalogo.json")}catch(e){$("out").innerHTML='<div class="empty"><h2>No se pudo cargar</h2><p>Revise su conexión y vuelva a abrir la página.</p></div>';return}
+  var sel=$("qBrand");
+  D.brands.forEach(function(b,i){var o=document.createElement("option");o.value=i;o.textContent=b;sel.appendChild(o)});
+  var ch=$("chips");
+  var mk=function(lbl,val){var b=document.createElement("button");b.className="chip";b.type="button";b.textContent=lbl;b.setAttribute("aria-pressed",val===line?"true":"false");b.onclick=function(){line=val;[].forEach.call(ch.children,function(x){x.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true");run()};ch.appendChild(b)};
+  mk("Todas",-1);SHORT.forEach(function(s,i){mk(s,i)});
+  var m=store.get("yvs_mode");if(m==="veh")setMode("veh");
+  run();
+  fetch("imagenes.json").then(function(r){return r.json()}).then(function(j){IMG=j;render()}).catch(function(){});
+}
+function setMode(m){mode=m;$("tabNum").setAttribute("aria-selected",m==="num");$("tabVeh").setAttribute("aria-selected",m==="veh");$("pNum").hidden=m!=="num";$("pVeh").hidden=m!=="veh";store.set("yvs_mode",m);run()}
+$("tabNum").onclick=function(){setMode("num");$("qNum").focus()};
+$("tabVeh").onclick=function(){setMode("veh")};
+var t=null;function deb(){clearTimeout(t);t=setTimeout(run,180)}
+$("qNum").addEventListener("input",function(){$("clrNum").hidden=!this.value;deb()});
+$("clrNum").onclick=function(){$("qNum").value="";this.hidden=true;run();$("qNum").focus()};
+$("qModel").addEventListener("input",deb);$("qYear").addEventListener("input",deb);
+$("qBrand").addEventListener("change",function(){fillModels();run()});
+function fillModels(){
+  var b=$("qBrand").value,dl=$("models");dl.innerHTML="";if(b==="")return;b=+b;var seen={},out=[];
+  D.apps.forEach(function(a){if(a[1]===b&&a[2]&&!seen[a[2]]){seen[a[2]]=1;out.push(a[2])}});
+  out.sort().slice(0,400).forEach(function(x){var o=document.createElement("option");o.value=x;dl.appendChild(o)});
+}
+function run(){
+  if(!D)return;shown=60;last=[];var q,res=[];
+  if(mode==="num"){
+    q=norm($("qNum").value);
+    if(q.length>=2){
+      for(var i=0;i<D.nums.length;i++){var s=D.nums[i],k=s.indexOf(q);
+        if(k>=0&&(line<0||D.products[i][0]===line)){var a=s.lastIndexOf("|",k),b=s.indexOf("|",k);res.push({p:i,hit:s.slice(a+1,b)})}}
+    }else if(line>=0){D.products.forEach(function(p,i){if(p[0]===line)res.push({p:i})})}
+    else{last=null}
+  }else{
+    var b=$("qBrand").value,mo=$("qModel").value.trim().toUpperCase(),y=parseInt($("qYear").value,10);
+    var any=b!==""||mo||y;
+    if(any){var seen={};
+      D.apps.forEach(function(a){
+        if(b!==""&&a[1]!==+b)return;
+        if(line>=0&&D.products[a[0]][0]!==line)return;
+        if(y&&!(a[4]<=y&&a[5]>=y))return;
+        var bn=a[1]>=0?D.brands[a[1]]:"";
+        if(mo&&(bn+" "+a[2]).toUpperCase().indexOf(mo)<0)return;
+        var key=a[0]+"|"+a[2]+"|"+a[3]+"|"+a[6];if(seen[key])return;seen[key]=1;res.push({p:a[0],a:a});
+      });
+    }else if(line>=0){D.products.forEach(function(p,i){if(p[0]===line)res.push({p:i})})}
+    else{last=null}
+  }
+  if(last!==null)last=res;render();
+}
+function hl(text,q){if(!q)return esc(text);var i=text.toUpperCase().indexOf(q);if(i<0)return esc(text);return esc(text.slice(0,i))+"<mark>"+esc(text.slice(i,i+q.length))+"</mark>"+esc(text.slice(i+q.length))}
+function thumb(p,big){var id=p[4];if(id>=0&&IMG[id])return '<img src="'+IMG[id]+'" alt="'+esc(p[1])+'" loading="lazy">';return big?"":'<span>YVS</span>'}
+function render(){
+  var out=$("out"),st=$("status");
+  if(last===null){
+    st.innerHTML="<span><b>"+D.products.length.toLocaleString("es-MX")+"</b> referencias · <b>"+D.apps.length.toLocaleString("es-MX")+"</b> aplicaciones</span>";
+    out.innerHTML='<div class="empty"><h2>'+(mode==="num"?"Busque por número":"Busque por vehículo")+'</h2><p>'+(mode==="num"?"Escriba un número OE, KYB, Monroe, Sachs, Gabriel, FMSI o un código YVS. Basta una parte; espacios y guiones no importan.":"Elija la marca, escriba el modelo o parte de él y, si quiere, el año. Use las líneas de arriba para afinar.")+'</p><p>Pruebe un ejemplo:</p><div class="ex">'+(mode==="num"?["343418","D1089","48609","RS55865"]:["TOYOTA|HILUX|2012","CHEVROLET|AVEO|2010","NISSAN|SENTRA|2015"]).map(function(x){return '<button class="chip" type="button" data-ex="'+x+'">'+x.replace(/\|/g," · ")+'</button>'}).join("")+'</div></div>';
+    [].forEach.call(out.querySelectorAll("[data-ex]"),function(b){b.onclick=function(){var v=b.getAttribute("data-ex");if(mode==="num"){$("qNum").value=v;$("clrNum").hidden=false}else{var p=v.split("|");$("qBrand").value=String(D.brands.indexOf(p[0]));fillModels();$("qModel").value=p[1];$("qYear").value=p[2]}run()}});
+    return;
+  }
+  var n=last.length;
+  st.innerHTML="<span><b>"+n.toLocaleString("es-MX")+"</b> "+(n===1?"resultado":"resultados")+(line>=0?" · "+esc(SHORT[line]):"")+"</span>"+(n?"<span>Toque una tarjeta para ver la ficha</span>":"");
+  if(!n){out.innerHTML='<div class="empty"><h2>Sin coincidencias</h2><p>Pruebe con menos dígitos del número, quite el año o cambie la línea a «Todas».</p></div>';return}
+  var q=mode==="num"?norm($("qNum").value):$("qModel").value.trim().toUpperCase();
+  var h=last.slice(0,shown).map(function(r,ix){var p=D.products[r.p],L=SHORT[p[0]],veh,meta=[];
+    if(r.a){var a=r.a,bn=a[1]>=0?D.brands[a[1]]:"";veh=hl((bn?bn+" ":"")+a[2],q);if(a[3])meta.push("<span>"+esc(a[3])+"</span>");if(a[6])meta.push('<span class="pos">'+esc(a[6])+"</span>")}
+    else{var ad=(p[5].find(function(d){return d[0].indexOf("Aplicaci")===0})||[])[1];var fl=ad?String(ad).split("\n"):[];veh=fl.length?esc(fl[0])+(fl.length>1?' <span class="tag">+'+(fl.length-1)+" más</span>":""):esc(p[6]||p[2]);var pos=(p[5].find(function(d){return d[0]==="Posición"})||[])[1];if(pos)meta.push('<span class="pos">'+esc(pos)+"</span>")}
+    if(r.hit)meta.push("<span>Coincide: "+hl(r.hit,q)+"</span>");
+    if(p[3]!=null)meta.push('<span class="price">'+fmtUSD(p[3])+"</span>");
+    return '<button class="card" type="button" data-i="'+r.p+'"><div class="thumb">'+thumb(p)+'</div><div class="ci"><div class="top"><span class="code">'+esc(p[1])+'</span><span class="tag">'+esc(L)+" · "+esc(p[2])+'</span></div><div class="veh">'+veh+'</div><div class="meta">'+meta.join("")+"</div></div></button>"}).join("");
+  if(n>shown)h+='<button class="btn more" id="more" type="button">Mostrar más ('+(n-shown).toLocaleString("es-MX")+" restantes)</button>";
+  out.innerHTML=h;
+  [].forEach.call(out.querySelectorAll(".card"),function(c){c.onclick=function(){openSheet(+c.getAttribute("data-i"))}});
+  var mb=$("more");if(mb)mb.onclick=function(){shown+=60;render()};
+}
+function openSheet(i){
+  var p=D.products[i];$("shLine").textContent=D.lines[p[0]]+" · "+p[2];$("shCode").textContent=p[1];
+  var im=thumb(p,true),h="";
+  if(im)h+='<div class="pic">'+im+"</div>";
+  h+='<div class="row"><button class="btn" id="cp" type="button">Copiar código</button></div>';
+  if(p[3]!=null)h+='<dl><dt>Precio unitario</dt><dd><b>'+fmtUSD(p[3])+"</b></dd></dl>";
+  h+="<dl>"+p[5].map(function(d){return"<dt>"+esc(d[0])+"</dt><dd>"+esc(d[1])+"</dd>"}).join("")+"</dl>";
+  var ap=D.apps.filter(function(a){return a[0]===i});
+  if(ap.length){h+='<div class="sec">Aplicaciones ('+ap.length+")</div><div class=\"apps\">"+ap.slice(0,300).map(function(a){return"<div>"+esc((a[1]>=0?D.brands[a[1]]+" ":"")+a[2])+(a[3]?" · "+esc(a[3]):"")+(a[6]?" · "+esc(a[6]):"")+"</div>"}).join("")+"</div>"}
+  $("shBody").innerHTML=h;$("sheet").hidden=false;document.body.style.overflow="hidden";
+  $("cp").onclick=function(){var b=this,done=function(){b.textContent="Copiado ✓";setTimeout(function(){b.textContent="Copiar código"},1600)};
+    if(navigator.clipboard)navigator.clipboard.writeText(p[1]).then(done,function(){sel()});else sel();
+    function sel(){var r=document.createRange();r.selectNodeContents($("shCode"));var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="Código seleccionado"}};
+  $("shClose").focus();
+}
+function closeSheet(){$("sheet").hidden=true;document.body.style.overflow=""}
+$("shClose").onclick=closeSheet;$("sheet").addEventListener("click",function(e){if(e.target===this)closeSheet()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet()});
+
+var deferred=null,standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+if(!standalone&&isIOS)$("tabInst").hidden=false;
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!standalone)$("tabInst").hidden=false});
+window.addEventListener("appinstalled",function(){$("tabInst").hidden=true});
+$("tabInst").onclick=function(){
+  if(deferred){deferred.prompt();deferred.userChoice.then(function(){deferred=null});return}
+  $("shLine").textContent="Instalar en el celular";$("shCode").textContent="App YVS";
+  $("shBody").innerHTML='<div class="ios"><b>iPhone (Safari)</b><ol><li>Toque el botón Compartir (cuadro con flecha hacia arriba).</li><li>Elija «Agregar a pantalla de inicio».</li><li>Toque «Agregar». El icono YVS aparece junto a sus apps.</li></ol></div><div class="ios"><b>Android (Chrome)</b><ol><li>Toque el menú ⋮ arriba a la derecha.</li><li>Elija «Instalar app» o «Agregar a pantalla principal».</li></ol></div>';
+  $("sheet").hidden=false;document.body.style.overflow="hidden";
+};
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+function net(){$("off").textContent=navigator.onLine?"":"Sin conexión · usando el catálogo guardado en este teléfono"}
+window.addEventListener("online",net);window.addEventListener("offline",net);net();
+init();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+APP BUSCADOR YVS — CÓMO PUBLICARLA E INSTALARLA
+================================================
+
+Esta carpeta es una app web instalable (PWA). Para que se pueda instalar en
+el celular debe estar publicada en una dirección https. Una vez instalada
+funciona sin conexión: el catálogo queda guardado en el teléfono.
+
+1) PUBLICAR (una sola vez)
+   Opción A — Sitio web de YVS (recomendada)
+     Suba TODO el contenido de esta carpeta a una subcarpeta de su hosting,
+     por ejemplo:  https://www.yvsystem.com/catalogo/
+     (Administrador de archivos de cPanel o FTP). El sitio debe tener https.
+
+   Opción B — Netlify (gratis)
+     Entre a https://app.netlify.com/drop, cree una cuenta gratuita y
+     arrastre esta carpeta completa. Netlify le da una dirección https que
+     puede cambiar por un nombre como  yvs-catalogo.netlify.app
+
+   Opción C — GitHub Pages (gratis)
+     Cree un repositorio, suba estos archivos y active Pages en Settings.
+
+2) INSTALAR EN EL CELULAR
+   Android (Chrome): abra la dirección > toque «Instalar» en la barra
+     inferior de la app, o menú ⋮ > «Instalar app».
+   iPhone (Safari): abra la dirección > botón Compartir >
+     «Agregar a pantalla de inicio» > «Agregar».
+   Aparece el icono YVS junto a las demás apps.
+
+3) ACTUALIZAR EL CATÁLOGO
+   Reemplace catalogo.json e imagenes.json por las versiones nuevas y
+   cambie la línea VERSION al inicio de sw.js (por ejemplo, a la fecha del
+   día). Los teléfonos reciben la actualización la próxima vez que abran
+   la app con internet.
+
+Contenido: index.html, manifest.webmanifest, sw.js, catalogo.json,
+imagenes.json y la carpeta icons/. No cambie los nombres de los archivos.
