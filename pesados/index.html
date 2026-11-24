@@ -255,13 +255,21 @@ $("shClose").onclick=closeSheet;$("sheet").addEventListener("click",function(e){
 document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet()});
 var deferred=null,standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
 var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-if(!standalone&&isIOS)$("tabInst").hidden=false;
-window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!standalone)$("tabInst").hidden=false});
+if(!standalone)$("tabInst").hidden=false;
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e});
 window.addEventListener("appinstalled",function(){$("tabInst").hidden=true});
+function guide(){
+  var ua=navigator.userAgent,inApp=/FBAN|FBAV|Instagram|WhatsApp|Line\/|; wv\)|GSA\//i.test(ua),ios=/iphone|ipad|ipod/i.test(ua),sam=/SamsungBrowser/i.test(ua),and=/android/i.test(ua),h="";
+  if(inApp)h+='<div class="ios"><b>Primero abra esta página en el navegador</b><ol><li>Toque el menú ⋮ o ··· de esta ventana.</li><li>Elija «Abrir en Chrome» (Android) o «Abrir en Safari» (iPhone).</li></ol></div>';
+  if(ios||!and)h+='<div class="ios"><b>iPhone (Safari)</b><ol><li>Toque el botón Compartir (cuadro con flecha hacia arriba), abajo al centro.</li><li>Deslice hacia abajo y elija «Agregar a pantalla de inicio».</li><li>Toque «Agregar».</li></ol></div>';
+  if(sam)h+='<div class="ios"><b>Samsung Internet</b><ol><li>Toque el menú ≡ abajo a la derecha.</li><li>Elija «Agregar página a» → «Pantalla de inicio».</li></ol></div>';
+  if(and||!ios)h+='<div class="ios"><b>Android (Chrome)</b><ol><li>Toque el menú ⋮ arriba a la derecha.</li><li>Elija «Instalar app» o «Agregar a pantalla principal».</li><li>Confirme con «Instalar».</li></ol></div>';
+  return h;
+}
 $("tabInst").onclick=function(){
   if(deferred){deferred.prompt();deferred.userChoice.then(function(){deferred=null});return}
   $("shLine").textContent="Instalar en el celular";$("shCode").textContent="YVS Heavy Truck";
-  $("shBody").innerHTML='<div class="ios"><b>iPhone (Safari)</b><ol><li>Toque el botón Compartir (cuadro con flecha hacia arriba).</li><li>Elija «Agregar a pantalla de inicio».</li><li>Toque «Agregar».</li></ol></div><div class="ios"><b>Android (Chrome)</b><ol><li>Toque el menú ⋮ arriba a la derecha.</li><li>Elija «Instalar app» o «Agregar a pantalla principal».</li></ol></div>';
+  $("shBody").innerHTML=guide();
   $("sheet").hidden=false;document.body.style.overflow="hidden";
 };
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}

@@ -1,5 +1,5 @@
 /* YVS — cache del catálogo para uso sin conexión. Cambie VERSION al publicar un catálogo nuevo. */
-const VERSION = "yvs-heavy-2026-11-23";
+const VERSION = "yvs-heavy-2026-11-24";
 const CORE = ["./", "index.html", "manifest.webmanifest", "catalogo.json",
   "icons/logo.png", "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/apple-touch-icon.png", "icons/favicon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
