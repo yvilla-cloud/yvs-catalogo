@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>YVS Heavy Truck</title>
+<meta name="description" content="Catálogo Maestro Heavy Duty YVS: busque por número OE, OEM, competencia o por aplicación.">
+<meta name="theme-color" content="#111111">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="YVS Heavy">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: black brand band + sticky search panel, single-column result cards, bottom-sheet product detail */
+:root{
+  --yel:#FFD300; --ink:#111111; --red:#C80A00;
+  --bg:#F5F4EF; --card:#FFFFFF; --fg:#16150F; --muted:#6B6858; --line:#E3E0D3; --chip:#ECEAE0; --field:#FFFFFF; --hl:#FFF3B0;
+  --band:#111111; --bandfg:#F5F4EF;
+  --f-disp:"Barlow Condensed","Arial Narrow",Arial,sans-serif; --f-body:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --red:#FF5A4D; --bg:#121210; --card:#1C1B18; --fg:#F1EFE6; --muted:#A3A08F; --line:#2E2C26; --chip:#26251F; --field:#181814; --hl:#4A4110;
+  --band:#000000; --bandfg:#F1EFE6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --red:#FF5A4D; --bg:#121210; --card:#1C1B18; --fg:#F1EFE6; --muted:#A3A08F; --line:#2E2C26; --chip:#26251F; --field:#181814; --hl:#4A4110;
+  --band:#000000; --bandfg:#F1EFE6; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+.grid2>*,.field{min-width:0}
+.field select{width:100%}
+img{max-width:100%}
+html,body{overflow-x:hidden}
+
+input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.4;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--band)}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:760px;margin:0 auto}
+header.brand{background:var(--band);color:var(--bandfg);margin-top:calc(-1*env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px)}
+header.brand .wrap{display:flex;align-items:center;gap:12px;padding-block:12px}
+.logo{width:52px;height:52px;border-radius:10px;background:#FFFFFF;display:grid;place-items:center;flex:none}
+.logo img{width:44px;height:auto}
+.brand h1{font-family:var(--f-disp);font-weight:800;font-size:26px;letter-spacing:.02em;margin:0;line-height:1;text-transform:uppercase}
+.brand p{margin:3px 0 0;font-size:12px;color:#BDB9A8}
+.stripe{height:5px;background:var(--yel)}
+.panel{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.panel .wrap{padding-block:12px;display:grid;gap:10px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--chip);border-radius:10px;padding:3px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:600 14px var(--f-body);padding:9px 6px;border-radius:8px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--ink);color:var(--yel)}
+.field{display:flex;align-items:center;gap:8px;background:var(--field);border:2px solid var(--line);border-radius:10px;padding:0 12px;min-height:48px}
+.field:focus-within{border-color:var(--yel)}
+.field svg{flex:none;color:var(--muted)}
+.field input,.field select{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--fg);font:500 16px var(--f-body);padding:12px 0}
+.clear{border:0;background:var(--chip);color:var(--muted);border-radius:50%;width:26px;height:26px;font-size:16px;line-height:1;cursor:pointer;flex:none}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid2 .full{grid-column:1/-1}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:0 max(16px,env(safe-area-inset-left,0px))}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--fg);font:500 13px var(--f-body);padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--yel);border-color:var(--yel);color:#111111;font-weight:700}
+.status{font-size:13px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.status b{color:var(--fg)}
+main .wrap{padding-block:14px 40px;display:grid;gap:10px}
+.card{display:grid;grid-template-columns:64px 1fr;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;text-align:left;width:100%;color:inherit;font:inherit}
+.card:focus-visible,.chip:focus-visible,.tabs button:focus-visible,.btn:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
+.thumb{width:64px;height:64px;border-radius:8px;background:#FFFFFF;border:1px solid var(--line);display:grid;place-items:center;overflow:hidden}
+.thumb img{max-width:100%;max-height:100%;object-fit:contain}
+.thumb span{font:800 13px var(--f-disp);color:#8A8676;letter-spacing:.04em}
+.ci{min-width:0;display:grid;gap:3px}
+.top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.code{font:700 20px var(--f-disp);color:var(--red);letter-spacing:.02em}
+.tag{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.veh{font-weight:600;overflow-wrap:anywhere}
+.meta{font-size:13px;color:var(--muted);display:flex;gap:6px 12px;flex-wrap:wrap}
+.meta .pos{background:var(--chip);color:var(--fg);border-radius:6px;padding:1px 7px;font-weight:500}
+.price{font:700 15px var(--f-disp);color:var(--fg)}
+mark{background:var(--hl);color:inherit;border-radius:3px;padding:0 2px}
+.more{justify-self:center;margin-top:6px}
+.btn{border:0;background:var(--ink);color:var(--yel);font:700 14px var(--f-body);padding:12px 18px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:var(--chip);color:var(--fg)}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:18px;color:var(--muted);display:grid;gap:10px}
+.empty h2{margin:0;font:700 20px var(--f-disp);color:var(--fg);text-transform:uppercase;letter-spacing:.02em}
+.empty .ex{display:flex;flex-wrap:wrap;gap:6px}
+.loading{padding:28px 0;text-align:center;color:var(--muted)}
+.sheet{position:fixed;inset:0;z-index:40;display:grid;align-items:end;background:rgba(0,0,0,.5)}
+.sheet .box{background:var(--card);max-height:92vh;overflow-y:auto;border-radius:16px 16px 0 0;width:100%;max-width:760px;margin:0 auto;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+.sheet .hd{position:sticky;top:0;background:var(--card);border-bottom:4px solid var(--yel);display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+.sheet .hd .code{font-size:28px}
+.sheet .bd{padding:14px max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));display:grid;gap:14px}
+.pic{background:#FFFFFF;border:1px solid var(--line);border-radius:12px;display:grid;place-items:center;padding:10px;min-height:120px}
+.pic img{max-height:200px;object-fit:contain}
+dl{margin:0;display:grid;grid-template-columns:minmax(90px,34%) 1fr;border-top:1px solid var(--line)}
+dt,dd{margin:0;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+dt{color:var(--muted);font-weight:500;padding-right:10px}
+dd{white-space:pre-line;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.sec{font:700 16px var(--f-disp);text-transform:uppercase;letter-spacing:.04em;margin:4px 0 -4px}
+.apps{display:grid;gap:4px;font-size:14px}
+.apps div{padding:7px 10px;background:var(--chip);border-radius:8px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:0 0 28px}
+footer em{display:block;margin-top:4px}
+@media (prefers-reduced-motion:no-preference){.sheet .box{animation:up .18s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}}}
+html,body{margin:0}
+:root{padding-top:env(safe-area-inset-top,0px)}
+main .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+footer{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+nav.bar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--band);border-top:3px solid var(--yel);display:flex;justify-content:center;padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+nav.bar .in{display:flex;gap:4px;width:100%;max-width:760px}
+nav.bar button{flex:1;border:0;background:transparent;color:#A8A493;font:600 12px var(--f-body);display:grid;justify-items:center;gap:3px;padding:6px 4px;border-radius:10px;cursor:pointer}
+nav.bar button svg{width:24px;height:24px}
+nav.bar button[aria-selected="true"]{color:var(--yel)}
+.ios{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:8px}
+.ios ol{margin:0;padding-left:20px;display:grid;gap:6px}
+.offline{font-size:12px;color:var(--muted)}
+.fam{font-size:12px;font-weight:600;color:var(--muted)}
+.sys{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.desc{font-weight:600;overflow-wrap:anywhere}
+.app{font-size:13px;overflow-wrap:anywhere}
+.refs{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.card{grid-template-columns:1fr}
+.selfam{display:flex}
+</style>
+</head>
+<body><header class="brand"><div class="wrap">
+  <div class="logo"><img src="icons/logo.png" alt="YVS Auto Parts"></div>
+  <div><h1>YVS Heavy Truck</h1><p>Catálogo Maestro Heavy Duty 2026 · Camión, autobús y remolque</p></div>
+</div></header>
+<div class="stripe"></div>
+<section class="panel" aria-label="Búsqueda"><div class="wrap">
+  <div id="pNum">
+    <label class="field" for="qNum">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+      <input id="qNum" type="search" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="OE, OEM, Firestone, Fleetguard, Holset, YVS…">
+      <button class="clear" id="clrNum" type="button" aria-label="Borrar" hidden>×</button>
+    </label>
+  </div>
+  <div id="pVeh" hidden>
+    <label class="field" for="qTxt">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>
+      <input id="qTxt" type="search" autocomplete="off" spellcheck="false" placeholder="Ej.: KENWORTH T800, CUMMINS ISX, bolsa">
+      <button class="clear" id="clrTxt" type="button" aria-label="Borrar" hidden>×</button>
+    </label>
+  </div>
+  <label class="field selfam" for="qFam"><select id="qFam" aria-label="Familia de producto"><option value="-1">Todas las familias (62)</option></select></label>
+  <div class="chips" id="chips" aria-label="Sistema"></div>
+  <div class="status" id="status"><span>Cargando catálogo…</span></div>
+</div></section>
+<main><div class="wrap" id="out"><div class="loading">Cargando catálogo Heavy Duty…</div></div></main>
+<footer><div class="wrap"><div class="offline" id="off"></div>YVSYSTEM · El Marqués, Querétaro, México · México · Colombia<em>“Calidad en cada pieza, seguridad en cada kilómetro.”</em><a href="../" style="display:block;margin:8px 0;color:inherit;font-weight:600">¿Vehículo liviano? Abrir Buscador YVS ▸</a><span style="display:block;margin-top:6px">Números y descripciones de referencia. Confirme con el No. OE, VIN o placa del componente antes de despachar.</span></div></footer>
+<div class="sheet" id="sheet" hidden><div class="box" role="dialog" aria-modal="true" aria-labelledby="shCode"><div class="hd"><div><div class="tag" id="shLine"></div><div class="code" id="shCode"></div></div><button class="btn ghost" id="shClose" type="button">Cerrar</button></div><div class="bd" id="shBody"></div></div></div>
+<nav class="bar" aria-label="Secciones"><div class="in" role="tablist">
+  <button id="tabNum" role="tab" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></svg>N° de parte</button>
+  <button id="tabVeh" role="tab" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>Aplicación</button>
+  <button id="tabInst" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 21h14"/></svg>Instalar</button>
+</div></nav>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var D=null,TXT=[],mode="num",sys=-1,shown=50,last=null;
+var SHORT=["Suspensión y ejes","Frenos y ruedas","Motor","Remolque y carga","Carrocería y enfriamiento"];
+var SC=["#FFD300","#E10600","#2F6FDB","#1E9E5A","#8A5CD1"];
+var store={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},set:function(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+function norm(s){return String(s||"").toUpperCase().replace(/[\s\-\.\/_·,]/g,"")}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function fold(s){return String(s||"").toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}
+async function init(){
+  try{var r=await fetch("catalogo.json");if(!r.ok)throw 0;D=await r.json()}catch(e){$("out").innerHTML='<div class="empty"><h2>No se pudo cargar</h2><p>Abra la app una vez con internet para guardar el catálogo en el teléfono.</p></div>';return}
+  TXT=D.products.map(function(p){return fold([p[2],p[3],p[4],p[5],p[6],D.fams[p[1]]].concat(p[7].map(function(d){return d[1]})).join(" "))});
+  fillFams();
+  var ch=$("chips");
+  var mk=function(lbl,val){var b=document.createElement("button");b.className="chip";b.type="button";b.innerHTML=(val>=0?'<span class="sys" style="background:'+SC[val]+'"></span>':"")+esc(lbl);b.setAttribute("aria-pressed",val===sys?"true":"false");b.onclick=function(){sys=val;[].forEach.call(ch.children,function(x){x.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true");fillFams();run()};ch.appendChild(b)};
+  mk("Todos",-1);SHORT.forEach(function(s,i){mk(s,i)});
+  if(store.get("yvshd_mode")==="veh")setMode("veh");
+  run();
+}
+function fillFams(){
+  var sel=$("qFam"),cur=sel.value,cnt={};D.products.forEach(function(p){if(sys<0||p[0]===sys)cnt[p[1]]=(cnt[p[1]]||0)+1});
+  var ids=Object.keys(cnt).map(Number).sort(function(a,b){return a-b});
+  sel.innerHTML='<option value="-1">Todas las familias ('+ids.length+')</option>'+ids.map(function(i){return '<option value="'+i+'">'+esc(D.fams[i])+" ("+cnt[i]+")</option>"}).join("");
+  sel.value=cnt[cur]?cur:"-1";
+}
+function setMode(m){mode=m;$("tabNum").setAttribute("aria-selected",m==="num");$("tabVeh").setAttribute("aria-selected",m==="veh");$("pNum").hidden=m!=="num";$("pVeh").hidden=m!=="veh";store.set("yvshd_mode",m);run()}
+$("tabNum").onclick=function(){setMode("num");$("qNum").focus()};
+$("tabVeh").onclick=function(){setMode("veh");$("qTxt").focus()};
+var t=null;function deb(){clearTimeout(t);t=setTimeout(run,180)}
+$("qNum").addEventListener("input",function(){$("clrNum").hidden=!this.value;deb()});
+$("qTxt").addEventListener("input",function(){$("clrTxt").hidden=!this.value;deb()});
+$("clrNum").onclick=function(){$("qNum").value="";this.hidden=true;run();$("qNum").focus()};
+$("clrTxt").onclick=function(){$("qTxt").value="";this.hidden=true;run();$("qTxt").focus()};
+$("qFam").addEventListener("change",run);
+function run(){
+  if(!D)return;shown=50;var fam=+$("qFam").value,res=[],i;
+  var ok=function(p){return(sys<0||p[0]===sys)&&(fam<0||p[1]===fam)};
+  if(mode==="num"){
+    var q=norm($("qNum").value);
+    if(q.length>=2){for(i=0;i<D.keys.length;i++){var s=D.keys[i],k=s.indexOf(q);if(k>=0&&ok(D.products[i])){var a=s.lastIndexOf("|",k),b=s.indexOf("|",k);res.push({p:i,hit:s.slice(a+1,b)})}}}
+    else if(fam>=0||sys>=0){D.products.forEach(function(p,i){if(ok(p))res.push({p:i})})}
+    else{last=null;render();return}
+  }else{
+    var w=fold($("qTxt").value).split(/\s+/).filter(Boolean);
+    if(w.length){for(i=0;i<TXT.length;i++){if(!ok(D.products[i]))continue;var tx=TXT[i],all=true;for(var j=0;j<w.length;j++){if(tx.indexOf(w[j])<0){all=false;break}}if(all)res.push({p:i})}}
+    else if(fam>=0||sys>=0){D.products.forEach(function(p,i){if(ok(p))res.push({p:i})})}
+    else{last=null;render();return}
+  }
+  last=res;render();
+}
+function hl(text,q){if(!q)return esc(text);var u=fold(text),i=u.indexOf(fold(q));if(i<0)return esc(text);return esc(text.slice(0,i))+"<mark>"+esc(text.slice(i,i+q.length))+"</mark>"+esc(text.slice(i+q.length))}
+function render(){
+  var out=$("out"),st=$("status");
+  if(last===null){
+    st.innerHTML="<span><b>"+D.products.length.toLocaleString("es-MX")+"</b> códigos YVS · <b>62</b> familias · <b>5</b> sistemas</span>";
+    var ex=mode==="num"?["8050","LF9009","3800X","HX40","1R14-039"]:["KENWORTH T800","CUMMINS ISX","FREIGHTLINER CASCADIA","VOLVO VNL FARO"];
+    out.innerHTML='<div class="empty"><h2>'+(mode==="num"?"Busque por número":"Busque por aplicación")+'</h2><p>'+(mode==="num"?"Escriba cualquier número: YVS, OE, OEM, Monroe, Gabriel, Firestone, Fleetguard, Dayco, Holset, Garrett, Bosch… Basta una parte; guiones, espacios y puntos no importan.":"Escriba marca, modelo, motor o tipo de pieza. Puede combinar palabras, por ejemplo «KENWORTH T800» o «CUMMINS ISX». También puede elegir solo una familia o un sistema para recorrer el catálogo.")+'</p><p>Pruebe un ejemplo:</p><div class="ex">'+ex.map(function(x){return '<button class="chip" type="button" data-ex="'+esc(x)+'">'+esc(x)+"</button>"}).join("")+"</div></div>";
+    [].forEach.call(out.querySelectorAll("[data-ex]"),function(b){b.onclick=function(){var v=b.getAttribute("data-ex");if(mode==="num"){$("qNum").value=v;$("clrNum").hidden=false}else{$("qTxt").value=v;$("clrTxt").hidden=false}run()}});
+    return;
+  }
+  var n=last.length;
+  st.innerHTML="<span><b>"+n.toLocaleString("es-MX")+"</b> "+(n===1?"resultado":"resultados")+"</span>"+(n?"<span>Toque una tarjeta para ver la ficha</span>":"");
+  if(!n){out.innerHTML='<div class="empty"><h2>Sin coincidencias</h2><p>Pruebe con menos dígitos o menos palabras, o elija «Todos» y «Todas las familias».</p></div>';return}
+  var qn=norm($("qNum").value),qt=fold($("qTxt").value).split(/\s+/).filter(Boolean)[0]||"";
+  var h=last.slice(0,shown).map(function(r){var p=D.products[r.p],meta=[];
+    if(r.hit&&norm(p[2])!==r.hit)meta.push("<span>Coincide: "+hl(r.hit,qn)+"</span>");
+    return '<button class="card" type="button" data-i="'+r.p+'"><div class="ci"><div class="top"><span class="code">'+esc(p[2])+'</span><span class="fam"><span class="sys" style="background:'+SC[p[0]]+'"></span>'+esc(D.fams[p[1]])+'</span></div>'+
+      (p[3]&&p[3]!==D.fams[p[1]]?'<div class="desc">'+(mode==="veh"?hl(p[3],qt):esc(p[3]))+"</div>":"")+
+      (p[4]?'<div class="app">'+(mode==="veh"?hl(p[4],qt):esc(p[4]))+"</div>":"")+
+      (p[5]?'<div class="refs">Ref.: '+esc(p[5].length>110?p[5].slice(0,110)+"…":p[5])+"</div>":"")+
+      (meta.length?'<div class="meta">'+meta.join("")+"</div>":"")+"</div></button>"}).join("");
+  if(n>shown)h+='<button class="btn more" id="more" type="button">Mostrar más ('+(n-shown).toLocaleString("es-MX")+" restantes)</button>";
+  out.innerHTML=h;
+  [].forEach.call(out.querySelectorAll(".card"),function(c){c.onclick=function(){openSheet(+c.getAttribute("data-i"))}});
+  var mb=$("more");if(mb)mb.onclick=function(){shown+=50;render()};
+}
+function openSheet(i){
+  var p=D.products[i];$("shLine").textContent=D.systems[p[0]]+" · "+D.fams[p[1]];$("shCode").textContent=p[2];
+  var h='<div class="row"><button class="btn" id="cp" type="button">Copiar código</button></div>';
+  var rows=[];if(p[3])rows.push(["Descripción",p[3]]);if(p[4])rows.push(["Aplicación",p[4]]);
+  p[7].forEach(function(d){if(d[1]!==p[4]&&d[1]!==p[3])rows.push(d)});
+  if(p[5])rows.push(["Referencias cruzadas",p[5]]);
+  h+="<dl>"+rows.map(function(d){return"<dt>"+esc(d[0])+"</dt><dd>"+esc(d[1])+"</dd>"}).join("")+"</dl>";
+  h+='<p class="refs">Referencia. Confirme la aplicación con el No. OE, VIN o placa del componente antes de despachar.</p>';
+  $("shBody").innerHTML=h;$("sheet").hidden=false;document.body.style.overflow="hidden";
+  $("cp").onclick=function(){var b=this,done=function(){b.textContent="Copiado ✓";setTimeout(function(){b.textContent="Copiar código"},1600)};
+    if(navigator.clipboard)navigator.clipboard.writeText(p[2]).then(done,sel);else sel();
+    function sel(){var r=document.createRange();r.selectNodeContents($("shCode"));var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="Código seleccionado"}};
+  $("shClose").focus();
+}
+function closeSheet(){$("sheet").hidden=true;document.body.style.overflow=""}
+$("shClose").onclick=closeSheet;$("sheet").addEventListener("click",function(e){if(e.target===this)closeSheet()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet()});
+var deferred=null,standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+if(!standalone&&isIOS)$("tabInst").hidden=false;
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e;if(!standalone)$("tabInst").hidden=false});
+window.addEventListener("appinstalled",function(){$("tabInst").hidden=true});
+$("tabInst").onclick=function(){
+  if(deferred){deferred.prompt();deferred.userChoice.then(function(){deferred=null});return}
+  $("shLine").textContent="Instalar en el celular";$("shCode").textContent="YVS Heavy Truck";
+  $("shBody").innerHTML='<div class="ios"><b>iPhone (Safari)</b><ol><li>Toque el botón Compartir (cuadro con flecha hacia arriba).</li><li>Elija «Agregar a pantalla de inicio».</li><li>Toque «Agregar».</li></ol></div><div class="ios"><b>Android (Chrome)</b><ol><li>Toque el menú ⋮ arriba a la derecha.</li><li>Elija «Instalar app» o «Agregar a pantalla principal».</li></ol></div>';
+  $("sheet").hidden=false;document.body.style.overflow="hidden";
+};
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})})}
+function net(){$("off").textContent=navigator.onLine?"":"Sin conexión · usando el catálogo guardado en este teléfono"}
+window.addEventListener("online",net);window.addEventListener("offline",net);net();
+init();
+})();
+</script>
+</body>
+</html>
