@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
-<!-- yvs-build 2026-11-24 -->
+<!-- yvs-build 2026-11-24b -->
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>YVS Heavy Truck</title>
@@ -256,7 +256,7 @@ $("shClose").onclick=closeSheet;$("sheet").addEventListener("click",function(e){
 document.addEventListener("keydown",function(e){if(e.key==="Escape")closeSheet()});
 var deferred=null,standalone=window.matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
 var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-if(!standalone)$("tabInst").hidden=false;
+if(!standalone)$("tabInst").hidden=false;else{var o=$("off");if(o&&o.parentNode){var ok=document.createElement("div");ok.className="offline";ok.textContent="✓ App instalada en este teléfono";o.parentNode.insertBefore(ok,o)}}
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();deferred=e});
 window.addEventListener("appinstalled",function(){$("tabInst").hidden=true});
 function guide(){

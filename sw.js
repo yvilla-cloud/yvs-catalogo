@@ -1,5 +1,5 @@
 /* YVS — cache del catálogo para uso sin conexión. Cambie VERSION al publicar un catálogo nuevo. */
-const VERSION = "yvs-catalogo-2026-11-24b";
+const VERSION = "yvs-catalogo-2026-11-24c";
 const CORE = ["./", "index.html", "manifest.webmanifest", "catalogo.json", "imagenes.json",
   "icons/logo.png", "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png", "icons/apple-touch-icon.png", "icons/favicon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
@@ -13,7 +13,7 @@ self.addEventListener("fetch", e => {
   if (url.origin === location.origin) {
     // la página: primero red (para recibir actualizaciones), si no hay señal usa la copia guardada
     if (req.mode === "navigate") {
-      e.respondWith(fetch(req).then(r => { const c = r.clone(); caches.open(VERSION).then(x => x.put("index.html", c)); return r; })
+      e.respondWith(fetch(req, {cache: "no-cache"}).then(r => { const c = r.clone(); caches.open(VERSION).then(x => x.put("index.html", c)); return r; })
         .catch(() => caches.match("index.html")));
       return;
     }
